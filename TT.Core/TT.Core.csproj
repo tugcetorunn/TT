@@ -4,6 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  <PackageId>CorePackageAuthorization</PackageId>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <Version>1.0.0</Version>
+	  <Authors>TT</Authors>
+	  <Company>TTCompany</Company>
+	  <Description>TokenProduction</Description>
+	  <PackageOutputPath>..\..\GeneratedPackages</PackageOutputPath> <!-- C:\Users\TT\source\CORE LIBRARIES\TT\TT.Core (csproj burada çünkü) bu yoldan
+																		  iki üste gidip isimli dosyayı oluşturduk bu dosyanın içinde nuget package 
+																		  oluşturuldu. build aldığımızda bu dosyadaki değişiklikleri görebiliriz. -->
   </PropertyGroup>
 
   <ItemGroup>
