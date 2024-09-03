@@ -11,10 +11,16 @@ namespace TT.Core.Authorization
         // token mekanizmasını neden kullanırız ? 
         // önce database imizde olan kullanıcıları kontrol mekanizmasından geçirip (email, password) kullanıcılarımızın içindense token üretiriz.
         private readonly IConfiguration configuration; // configuration dosyasından bilgi alacağımız için ekliyoruz.
+        private readonly string _secretKey;
+        private readonly string _issuer;
+        private readonly string? _audience;
 
-        public TokenService(IConfiguration _configuration)
+        public TokenService(IConfiguration _configuration, string secretKey, string issuer, string? audience)
         {
             configuration = _configuration;
+            _secretKey = secretKey;
+            _issuer = issuer;
+            _audience = audience;
         }
 
         public string GenerateToken(string userId, string userEmail)
@@ -55,6 +61,39 @@ namespace TT.Core.Authorization
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public bool IsValidToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return false;
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_secretKey);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true, // Program.cs ile uyumlu
+                    ValidateAudience = false, // Program.cs ile uyumlu
+                    ValidateLifetime = true, // Süre dolmuş mu kontrolü
+                    ValidateIssuerSigningKey = true, // İmza anahtarının doğruluğu kontrolü
+                    ValidIssuer = _issuer, // Geçerli issuer
+                    ValidAudience = _audience, // Geçerli audience
+                    IssuerSigningKey = new SymmetricSecurityKey(key), // İmzalama anahtarı
+                    ClockSkew = TimeSpan.FromMinutes(5) // Program.cs ile aynı tolerans süresi
+                }, out SecurityToken validatedToken);
+
+                return true; // Token geçerli
+            }
+            catch (Exception)
+            {
+                // Hata durumunda false döner, hatayı loglayabilirsiniz
+                return false;
+            }
         }
 
     }
